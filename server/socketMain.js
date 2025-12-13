@@ -20,6 +20,14 @@ const socketMain = (io) => {
       console.log('Tick...');
       console.log(data);
     });
+
+    socket.on('testConnection', (data) => {
+      console.log(data);
+    });
+
+    socket.on('secondTest', (data) => {
+      console.log(data);
+    });
   });
 };
 

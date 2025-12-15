@@ -1,5 +1,7 @@
 const socketMain = (io) => {
   io.on('connection', (socket) => {
+    let machineMacA;
+
     const auth = socket.handshake.auth;
     console.log(auth.token);
     if (auth.token === '209382j4hkl2j34lj234jjj234lk') {
@@ -19,6 +21,14 @@ const socketMain = (io) => {
     socket.on('perfData', (data) => {
       console.log('Tick...');
       console.log(data);
+      if (!machineMacA) {
+        machineMacA = data.macA;
+        io.to('reactClient').emit('connectedOrNot', {
+          machineMacA,
+          isAlive: true,
+        });
+      }
+      io.to('reactClient').emit('perfData', data);
     });
 
     socket.on('testConnection', (data) => {
@@ -27,6 +37,14 @@ const socketMain = (io) => {
 
     socket.on('secondTest', (data) => {
       console.log(data);
+    });
+
+    socket.on('disconnect', (reason) => {
+      // a nodeClient just disconnected. Let the front end know!
+      io.to('reactClient').emit('connectedOrNot', {
+        machineMacA,
+        isAlive: false,
+      });
     });
   });
 };

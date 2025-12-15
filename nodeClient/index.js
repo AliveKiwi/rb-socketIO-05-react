@@ -4,6 +4,42 @@
 // - socket.io-client
 
 const os = require('os'); // native to node
+const io = require('socket.io-client');
+const options = {
+  auth: {
+    token: '209382j4hkl2j34lj234jjj234lk',
+  },
+};
+
+const socket = io('http://127.0.0.1:3000', options); // server is running at 3000
+
+socket.on('connect', () => {
+  // console.log("We connected to the server")
+  // we need a way to identify this machine to the server, for front end useage
+  // we could use, socket.id, randomHash, ipAddress, mac
+  const nI = os.networkInterfaces();
+  let macA;
+  // loop through all nI until we find a non-internal one.
+  for (let key in nI) {
+    const isInternetFacing = !nI[key][0].internal;
+    if (isInternetFacing) {
+      // we have a macA we can use!
+      macA = nI[key][0].mac;
+      break;
+    }
+  }
+  const perfDataInterval = setInterval(async () => {
+    // every second call performance data and emit
+    const perfData = await performanceLoadData();
+    perfData.macA = macA;
+    socket.emit('perfData', perfData);
+  }, 1000);
+
+  socket.on('disconnect', () => {
+    clearInterval(perfDataInterval);
+    //this includes!!! reconnect
+  });
+});
 
 const cpuAverage = () => {
   const cpus = os.cpus();

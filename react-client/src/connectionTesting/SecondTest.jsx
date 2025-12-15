@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import socket from '../socketConnection';
+import socket from '../utilities/socketConnection';
 
 const SecondTest = () => {
   useEffect(() => {
